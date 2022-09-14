@@ -1,0 +1,38 @@
+<link rel= "stylesheet" type= "text/css" href='/static/overlay.css' />
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Carpark{% endblock %}</h1>
+  {% if g.user %}
+    <a class="action" href="{{ url_for('carpark.create') }}">New</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="img-overlay-wrap">
+  <img src="https://via.placeholder.com/800">
+  <svg viewBox="0 0 800 800">
+  {% for bays in carbays %}
+    <rect x="{{ bays['pos1'] }}" y="{{ bays['pos2'] }}" width="{{ bays['width'] }}" height="{{ bays['height'] }}" style="fill:{{ bays['colour'] }}" />
+    <rect x={{ bays['pos1'] }} y={{ bays['pos2'] }} width={{ bays['width'] }} height={{ bays['height'] }} style="fill:{{ bays['colour'] }}" />
+  {% endfor %}
+  </svg>
+</div>
+  {% for post in posts %}
+    <article class="post">
+      <header>
+        <div>
+          <h1>{{ post['title'] }}</h1>
+          <div class="about">by {{ post['username'] }} on {{ post['created'].strftime('%Y-%m-%d') }}</div>
+        </div>
+        {% if g.user['id'] == post['author_id'] %}
+          <a class="action" href="{{ url_for('carpark.update', id=post['id']) }}">Edit</a>
+        {% endif %}
+      </header>
+      <p class="body">{{ post['body'] }}</p>
+    </article>
+    {% if not loop.last %}
+      <hr>
+    {% endif %}
+  {% endfor %}
+{% endblock %}
