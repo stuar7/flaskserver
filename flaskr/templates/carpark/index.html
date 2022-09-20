@@ -10,11 +10,10 @@
 
 {% block content %}
 <div class="img-overlay-wrap">
-  <img src="https://via.placeholder.com/800">
+  <img src="../../static/images/test.png">
   <svg viewBox="0 0 800 800">
   {% for bays in carbays %}
     <rect x="{{ bays['pos1'] }}" y="{{ bays['pos2'] }}" width="{{ bays['width'] }}" height="{{ bays['height'] }}" style="fill:{{ bays['colour'] }}" />
-    <rect x={{ bays['pos1'] }} y={{ bays['pos2'] }} width={{ bays['width'] }} height={{ bays['height'] }} style="fill:{{ bays['colour'] }}" />
   {% endfor %}
   </svg>
 </div>
