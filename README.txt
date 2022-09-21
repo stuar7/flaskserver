@@ -1,5 +1,5 @@
 1. Go to the directory with setup.py
-2. Run: pip install -e .
+2. Run [might be pip3]: pip install -e .
 3. Run [to start the server]: flask --app flaskr --debug run
 
 If no database is present: 
