@@ -34,7 +34,7 @@ def index():
 def update_carbay(bay):
     updated_carbay = {}
     try:
-        conn = db.get_db()
+        conn = get_db()
         cur = conn.cursor()
         cur.execute("UPDATE carpark SET pos1 = ?, pos2 = ?, height = ?, width = ?, colour = ? WHERE id = ?",  
                      (bay["pos1"], bay["pos2"], bay["height"], 
@@ -43,11 +43,10 @@ def update_carbay(bay):
         conn.commit()
         #return the user
         updated_carbay = get_carbay_by_id(bay["id"])
-        print("carbay" + updated_carbay)
+        print("carbay" + str(updated_carbay))
     except Exception as inst:
         print(inst)
         conn.rollback()
-        updated_user = {}
     finally:
         conn.close()
     return updated_carbay
@@ -56,7 +55,7 @@ def update_carbay(bay):
 def get_carbay_by_id(bay_id):
     carbay = {}
     try:
-        conn = db.get_db()
+        conn = get_db()
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
         cur.execute("SELECT * FROM carpark WHERE id = ?", 
