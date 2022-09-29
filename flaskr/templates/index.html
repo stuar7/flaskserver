@@ -1,0 +1,29 @@
+<link rel= "stylesheet" type= "text/css" href='/static/overlay.css' />
+{% extends 'base.html' %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type=text/javascript>
+        $(function() {
+          $('a#test').on('click', function(e) {
+            e.preventDefault()
+            $.getJSON('/redirect',
+                function(data) {
+              //do nothing
+            });
+            window.location.replace("/carpark")
+            return false;
+          });
+        });
+</script>
+
+
+<div class="img-overlay-wrap">
+    <a href=# id=test><img  id="map" src="../../static/images/cut2.png"></a>
+</div>
+
+{% endblock %}

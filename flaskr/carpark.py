@@ -1,9 +1,8 @@
-import sqlite3
+from datetime import datetime
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
 from werkzeug.exceptions import abort
-
 from flaskr.auth import login_required
 from flaskr.db import get_db
 
@@ -11,38 +10,60 @@ bp = Blueprint('carpark', __name__)
 
 @bp.route('/')
 def index():
+    return render_template('index.html')
+
+@bp.route('/redirect')
+def redirect():
+    print("Redirected")
+    return
+
+@bp.route('/<string:carparkname>/')
+@bp.route('/<string:carparkname>')
+def carpark(carparkname="carpark"):
     db = get_db()
-    # posts = db.execute(
-    #     'SELECT p.id, title, body, created, author_id, username'
-    #     ' FROM post p JOIN user u ON p.author_id = u.id'
-    #     ' ORDER BY created DESC'
-    # ).fetchall()
-    # print(posts)
     carbays = db.execute(
-        'SELECT c.id, pos1, pos2, width, height, colour'
-        ' FROM carpark c'
+        'SELECT c.id, p1, p2, p3, p4, status, date'
+        f' FROM {carparkname} c'
         ' ORDER BY c.id'
     ).fetchall()
-   # db.row_factory = sqlite3.Row
-   # row = carbays.fetchone()
+    TIME_DIFFERENCE = 500
+    colour = []
+    for x in carbays:
+        time_difference = int(datetime.now().timestamp()) - int(x['date'])
+        if(time_difference > TIME_DIFFERENCE):
+            colour.append("gray")
+        elif(time_difference < TIME_DIFFERENCE):
+            if(x['status'] == "full"):
+                colour.append("red")
+            elif(x['status'] == "empty"):
+                colour.append("green")
+            elif([x['status'] == "gray"]):
+                colour.append("gray")
+    carbays = [dict(i) for i in carbays]
+    for count, currlist in enumerate(carbays):
+        currlist['colour'] = colour[count]
 
-   # print(row)
-   # for x in row:
-   #     print(x) 
-    return render_template('carpark/index.html', carbays=carbays)
+    carparkimage = db.execute(
+        'SELECT carparkname, imageurl'
+        ' FROM s_carpark c'
+        f' WHERE carparkname="{carparkname}"'
+    ).fetchall()
+    imageurl = carparkimage[0][1]
+    return render_template('carpark/index.html', carbays=carbays, carparkimage=imageurl, carparkname=carparkname)
 
-def update_carbay(bay):
+def update_carbay(json):
     updated_carbay = {}
     try:
         conn = get_db()
         cur = conn.cursor()
-        cur.execute("UPDATE carpark SET pos1 = ?, pos2 = ?, height = ?, width = ?, colour = ? WHERE id = ?",  
-                     (bay["pos1"], bay["pos2"], bay["height"], 
-                     bay["width"], bay["colour"], 
-                     bay["id"],))
+        cur.execute("UPDATE ? SET p1 = ?, p2 = ?, p3 = ?, p4 = ?, status = ?, date = ? WHERE id = ?",  
+                     (json["carpark"], json["p1"], json["p2"], json["p3"], 
+                     json["p4"], json["status"], datetime.now().timestamp(), 
+                     json["id"])
+                     )
         conn.commit()
         #return the user
-        updated_carbay = get_carbay_by_id(bay["id"])
+        updated_carbay = get_carbay_by_id(json["id"])
         print("carbay" + str(updated_carbay))
     except Exception as inst:
         print(inst)
@@ -51,12 +72,27 @@ def update_carbay(bay):
         conn.close()
     return updated_carbay
 
+def update_carbay_status(json):
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("UPDATE ? status = ?, date = ? WHERE id = ?",
+                    (json["carpark"], json["status"], datetime.now(),
+                    json["id"])
+                    )
+        conn.commit()
+    except Exception as inst:
+        print(inst)
+        conn.rollback()
+    finally:
+        conn.close()
+    return
 
 def get_carbay_by_id(bay_id):
     carbay = {}
     try:
         conn = get_db()
-        conn.row_factory = sqlite3.Row
+       # conn.row_factory = sqlite3.Row
         cur = conn.cursor()
         cur.execute("SELECT * FROM carpark WHERE id = ?", 
                        (bay_id,))
@@ -64,12 +100,12 @@ def get_carbay_by_id(bay_id):
 
         # convert row object to dictionary
         carbay["id"] = row["id"]
-        carbay["pos1"] = row["pos1"]
-        carbay["pos2"] = row["pos2"]
-        carbay["width"] = row["width"]
-        carbay["height"] = row["height"]
+        carbay["p1"] = row["p1"]
+        carbay["p2"] = row["p2"]
+        carbay["p3"] = row["p3"]
+        carbay["p4"] = row["p4"]
         carbay["colour"] = row["colour"]
+        carbay["date"] = row["date"]
     except:
         carbay = {}
-
     return carbay

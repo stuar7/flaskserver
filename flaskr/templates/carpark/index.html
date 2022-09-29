@@ -2,18 +2,15 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Carpark{% endblock %}</h1>
-  {% if g.user %}
-    <a class="action" href="{{ url_for('carpark.create') }}">New</a>
-  {% endif %}
+<h1>{% block title %}{{ carparkname }}{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
 <div class="img-overlay-wrap">
-  <img src="../../static/images/test.png">
+  <img src="../../static/images/carpark/{{ carparkimage }}">
   <svg viewBox="0 0 800 800">
   {% for bays in carbays %}
-    <rect x="{{ bays['pos1'] }}" y="{{ bays['pos2'] }}" width="{{ bays['width'] }}" height="{{ bays['height'] }}" style="fill:{{ bays['colour'] }}" />
+    <polygon points="{{ bays['p1'] }} {{ bays['p2'] }} {{ bays['p3'] }} {{ bays['p4'] }}" fill="{{ bays['colour'] }}" fill-opacity="60%"/>
   {% endfor %}
   </svg>
 </div>

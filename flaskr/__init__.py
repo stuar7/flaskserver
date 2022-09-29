@@ -41,10 +41,18 @@ def create_app(test_config=None):
     app.register_blueprint(carpark.bp)
     app.add_url_rule('/', endpoint='index')
 
-    @app.route('/api/carbay/update',  methods = ['PUT'])
-    def api_update_carbay():
+    # API Route that updates all elements of a carbay entry
+    @app.route('/api/update_entry',  methods = ['PUT'])
+    def api_update_carbay_entry():
         carbay = request.get_json()
         print(carbay)
         return jsonify(carpark.update_carbay(carbay))
+    
+    # API Route that updates only the status of a carbay entry
+    @app.route('/api/update_status',  methods = ['PUT'])
+    def api_update_carbay_status():
+        json = request.get_json()
+        print(json)
+        return jsonify(carpark.update_carbay_status(json))
 
     return app
