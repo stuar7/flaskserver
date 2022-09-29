@@ -13,9 +13,9 @@
             e.preventDefault()
             $.getJSON('/redirect',
                 function(data) {
-              //do nothing
+                   // 
             });
-            window.location.replace("/carpark")
+            window.location.replace("/"+e.target['id'])
             return false;
           });
         });
@@ -23,7 +23,13 @@
 
 
 <div class="img-overlay-wrap">
-    <a href=# id=test><img  id="map" src="../../static/images/cut2.png"></a>
+    <a href=# id=test2><img  id="map" src="../../static/images/cut2.png"></a>
+   <!---<svg>   viewBox="0 0 800 800"> -->
+    <svg viewBox="0 0 992 1576">
+        {% for carpark in carparks %}
+        <a href=# id=test><polygon id="{{carpark['carparkname']}}" points="{{ carpark['points'] }}" fill="lightgreen" fill-opacity="30%"/></a>
+        {% endfor %}
+    </svg>
 </div>
 
 {% endblock %}

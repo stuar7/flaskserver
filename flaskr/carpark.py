@@ -10,12 +10,18 @@ bp = Blueprint('carpark', __name__)
 
 @bp.route('/')
 def index():
-    return render_template('index.html')
+    db = get_db()
+    carparks = db.execute(
+        'SELECT carparkname, points'
+        ' FROM s_carpark c'
+    ).fetchall()
+    ##for x in carparks:
+     #print(dict(carparks))
+    return render_template('index.html', carparks=carparks)
 
 @bp.route('/redirect')
 def redirect():
-    print("Redirected")
-    return
+    return "Null"
 
 @bp.route('/<string:carparkname>/')
 @bp.route('/<string:carparkname>')
@@ -26,7 +32,9 @@ def carpark(carparkname="carpark"):
         f' FROM {carparkname} c'
         ' ORDER BY c.id'
     ).fetchall()
+    # TIME_DIFFERENCE dictates how long the last status update is valid for in seconds.
     TIME_DIFFERENCE = 500
+    # For loop below determines which colour to mark the carbay as
     colour = []
     for x in carbays:
         time_difference = int(datetime.now().timestamp()) - int(x['date'])
@@ -43,6 +51,7 @@ def carpark(carparkname="carpark"):
     for count, currlist in enumerate(carbays):
         currlist['colour'] = colour[count]
 
+    # A seperate table, s_carpark, holds unique information regarding the carpark (name, image used)
     carparkimage = db.execute(
         'SELECT carparkname, imageurl'
         ' FROM s_carpark c'
@@ -92,13 +101,11 @@ def get_carbay_by_id(bay_id):
     carbay = {}
     try:
         conn = get_db()
-       # conn.row_factory = sqlite3.Row
         cur = conn.cursor()
         cur.execute("SELECT * FROM carpark WHERE id = ?", 
                        (bay_id,))
         row = cur.fetchone()
 
-        # convert row object to dictionary
         carbay["id"] = row["id"]
         carbay["p1"] = row["p1"]
         carbay["p2"] = row["p2"]
