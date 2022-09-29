@@ -12,7 +12,7 @@ bp = Blueprint('carpark', __name__)
 def index():
     db = get_db()
     carparks = db.execute(
-        'SELECT carparkname, points'
+        'SELECT carparkname, points, description, x, y'
         ' FROM s_carpark c'
     ).fetchall()
     ##for x in carparks:
@@ -52,13 +52,14 @@ def carpark(carparkname="carpark"):
         currlist['colour'] = colour[count]
 
     # A seperate table, s_carpark, holds unique information regarding the carpark (name, image used)
-    carparkimage = db.execute(
-        'SELECT carparkname, imageurl'
+    carparktable = db.execute(
+        'SELECT carparkname, imageurl, description'
         ' FROM s_carpark c'
         f' WHERE carparkname="{carparkname}"'
     ).fetchall()
-    imageurl = carparkimage[0][1]
-    return render_template('carpark/index.html', carbays=carbays, carparkimage=imageurl, carparkname=carparkname)
+    imageurl = carparktable[0][1]
+    description = carparktable[0][2]
+    return render_template('carpark/index.html', carbays=carbays, carparkimage=imageurl, carparkname=carparkname, description=description)
 
 def update_carbay(json):
     updated_carbay = {}

@@ -1,11 +1,7 @@
 <link rel= "stylesheet" type= "text/css" href='/static/overlay.css' />
 {% extends 'base.html' %}
 
-{% block header %}
-{% endblock %}
-
 {% block content %}
-
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type=text/javascript>
         $(function() {
@@ -21,15 +17,15 @@
         });
 </script>
 
-
 <div class="img-overlay-wrap">
-    <a href=# id=test2><img  id="map" src="../../static/images/cut2.png"></a>
+    <a href=# id=test2><img  id="map" src="../../static/images/cropped.png"></a>
    <!---<svg>   viewBox="0 0 800 800"> -->
     <svg viewBox="0 0 992 1576">
         {% for carpark in carparks %}
         <a href=# id=test><polygon id="{{carpark['carparkname']}}" points="{{ carpark['points'] }}" fill="lightgreen" fill-opacity="30%"/></a>
+        <rect x="{{carpark['x'] - 2}}" y="{{carpark['y'] - 14}}" width="{{carpark['description'] | length * 9}}" height="18" fill="gray" />
+        <text x="{{carpark['x']}}" y="{{carpark['y']}}" class="small">{{carpark['description']}}</text>
         {% endfor %}
     </svg>
 </div>
-
 {% endblock %}
