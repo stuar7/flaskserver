@@ -8,6 +8,9 @@ from flaskr.db import get_db
 
 bp = Blueprint('carpark', __name__)
 
+# TIME_DIFFERENCE dictates how long the last status update is valid for in seconds.
+TIME_DIFFERENCE = 500
+
 @bp.route('/')
 def index():
     db = get_db()
@@ -15,8 +18,12 @@ def index():
         'SELECT carparkname, points, description, x, y'
         ' FROM s_carpark c'
     ).fetchall()
-    ##for x in carparks:
-     #print(dict(carparks))
+    carparks = [dict(i) for i in carparks]
+    for count, currlist in enumerate(carparks):
+        empty, full, non_responding = get_carpark_stats(currlist['carparkname'])
+        currlist['empty'] = empty
+        currlist['full'] = full
+        currlist['non_responding'] = non_responding
     return render_template('index.html', carparks=carparks)
 
 @bp.route('/redirect')
@@ -32,8 +39,6 @@ def carpark(carparkname="carpark"):
         f' FROM {carparkname} c'
         ' ORDER BY c.id'
     ).fetchall()
-    # TIME_DIFFERENCE dictates how long the last status update is valid for in seconds.
-    TIME_DIFFERENCE = 500
     # For loop below determines which colour to mark the carbay as
     colour = []
     for x in carbays:
@@ -61,6 +66,22 @@ def carpark(carparkname="carpark"):
     description = carparktable[0][2]
     return render_template('carpark/index.html', carbays=carbays, carparkimage=imageurl, carparkname=carparkname, description=description)
 
+def create_carbay(json):
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO ? (id,p1,p2,p3,p4,status,date) VALUES (?,?,?,?,?,?,?))",
+                     (json["carpark"], json["id"], json["p1"], json["p2"], json["p3"], 
+                     json["p4"], json["status"], datetime.now().timestamp(),)
+                     )
+        conn.commit()
+    except Exception as inst:
+        print(inst)
+        conn.rollback()
+    finally:
+        conn.close()
+    return
+
 def update_carbay(json):
     updated_carbay = {}
     try:
@@ -72,7 +93,6 @@ def update_carbay(json):
                      json["id"])
                      )
         conn.commit()
-        #return the user
         updated_carbay = get_carbay_by_id(json["id"])
         print("carbay" + str(updated_carbay))
     except Exception as inst:
@@ -87,7 +107,7 @@ def update_carbay_status(json):
         conn = get_db()
         cur = conn.cursor()
         cur.execute("UPDATE ? status = ?, date = ? WHERE id = ?",
-                    (json["carpark"], json["status"], datetime.now(),
+                    (json["carpark"], json["status"], datetime.now().timestamp(),
                     json["id"])
                     )
         conn.commit()
@@ -98,13 +118,13 @@ def update_carbay_status(json):
         conn.close()
     return
 
-def get_carbay_by_id(bay_id):
+def get_carbay_by_id(carpark, bay_id):
     carbay = {}
     try:
         conn = get_db()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM carpark WHERE id = ?", 
-                       (bay_id,))
+        cur.execute("SELECT * FROM ? WHERE id = ?", 
+                       (carpark, bay_id,))
         row = cur.fetchone()
 
         carbay["id"] = row["id"]
@@ -117,3 +137,23 @@ def get_carbay_by_id(bay_id):
     except:
         carbay = {}
     return carbay
+
+def get_carpark_stats(carpark):
+    empty = 0
+    full = 0
+    non_responding = 0
+    try:
+        db = get_db()
+        statusinfo = db.execute(f"SELECT status, date FROM {carpark}"
+        ).fetchall()
+        for row in statusinfo:
+            if int(datetime.now().timestamp()) - int(row[1]) > TIME_DIFFERENCE:
+                non_responding+=1
+            elif row[0] == 'empty':
+                empty+=1
+            elif row[0] == 'full':
+                full+=1
+    except Exception as inst:
+        print(inst)
+    return empty, full, non_responding
+        

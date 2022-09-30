@@ -16,16 +16,32 @@
           });
         });
 </script>
-
+<table>
+<tr>
+<td class="leftpanel">
+  <span>Car Park List</span>
+  <ol>
+  {% for carpark in carparks %}
+  <li><a href="/{{carpark['carparkname']}}">{{carpark['description']}}</a>
+  <br><span>Free:{{carpark['empty']}}
+  <br>Taken:{{carpark['full']}}
+  <br>Unknown:{{carpark['non_responding']}}</span>
+  {% endfor %}
+  </ol>
+</td>
+<td>
 <div class="img-overlay-wrap">
     <a href=# id=test2><img  id="map" src="../../static/images/cropped.png"></a>
    <!---<svg>   viewBox="0 0 800 800"> -->
     <svg viewBox="0 0 992 1576">
         {% for carpark in carparks %}
         <a href=# id=test><polygon id="{{carpark['carparkname']}}" points="{{ carpark['points'] }}" fill="lightgreen" fill-opacity="30%"/></a>
-        <rect x="{{carpark['x'] - 2}}" y="{{carpark['y'] - 14}}" width="{{carpark['description'] | length * 9}}" height="18" fill="gray" />
+        <rect x="{{carpark['x'] - 4}}" y="{{carpark['y'] - 14}}" width="{{carpark['description'] | length * 9}}" height="18" fill="lightgray" />
         <text x="{{carpark['x']}}" y="{{carpark['y']}}" class="small">{{carpark['description']}}</text>
         {% endfor %}
     </svg>
 </div>
+</td>
+</tr>
+</table>
 {% endblock %}
