@@ -1,4 +1,5 @@
 <link rel= "stylesheet" type= "text/css" href='/static/overlay.css' />
+<meta http-equiv="refresh" content="1" >
 {% extends 'base.html' %}
 
 {% block header %}
@@ -6,6 +7,24 @@
 {% endblock %}
 
 {% block content %}
+<script type=text/javascript>
+  $(function() {
+    $('a#test').on('click', function(e) {
+      e.preventDefault()
+      let test = await $.getJSON('/redirect',
+          function(data) {
+             return data
+      });
+      console.log(test)
+      http.onreadystatechange = function () {
+        if (http.readyState === 4 && http.status === 200) {
+            document.getElementById("json_field").innerHTML = http.responseText;
+        }
+      };
+      return false;
+    });
+  });
+</script>
 <div class="img-overlay-wrap">
   <img src="../../static/images/carpark/{{ carparkimage }}">
   <svg viewBox="0 0 800 800">

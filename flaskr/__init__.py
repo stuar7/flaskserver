@@ -1,7 +1,10 @@
 import os
+from socket import socket
 
 from flask import Flask, request, jsonify #added to top of file
 from flask_cors import CORS #added to top of file
+from flask_socketio import SocketIO, send
+from flask_mqtt import Mqtt
 
 import sqlite3
 
@@ -12,6 +15,8 @@ def create_app(test_config=None):
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
     )
+
+
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
@@ -49,5 +54,50 @@ def create_app(test_config=None):
         json = request.get_json()
         print(json)
         return jsonify(carpark.update_carbay_status(json))
+
+
+    # mosquito settings
+    app.config['SECRET_KEY'] = 'mysecret'
+    app.config['MQTT_BROKER_URL'] = '127.0.0.1'
+    app.config['MQTT_BROKER_PORT'] = 1883
+
+    #
+    mqtt = Mqtt(app)
+    mqtt.subscribe('/carpark')
+    socketio = SocketIO(app, cors_allowed_origins='*')
+
+    #@socketio.on('message')
+    #def handleMessage(msg):
+    #    print('Message ' +msg)
+    #    send(msg, boradcast=True)
+    #    return jsonify(carpark.update_carbay_status(msg))
+    @mqtt.on_connect()
+    def handle_connect(client, userdata, flags, rc):
+        if rc == 0:
+            print('Connected successfully')
+            mqtt.subscribe('/carpark') # subscribe topic
+        else:
+            print('Bad connection. Code:', rc)
+            
+    @mqtt.on_message()
+    def handle_mqtt_message(client, userdata, message):
+        #data = dict(
+        ##topic=message.topic,
+        #payload=message.payload.decode()
+        #)
+        #print('Received message on topic: {topic} with payload: {payload}'.format(**data))
+        import json
+        #print(message)
+        print(message.payload.decode())
+        msg = message.payload.decode().replace("'", '"')
+        print(json.loads(msg))
+        msg = json.loads(msg)
+        if(message.topic == '/carpark'):
+            with app.app_context():
+                return jsonify(carpark.update_carbay_status(msg))
+        else:
+            return
+
+
 
     return app

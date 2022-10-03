@@ -7,10 +7,6 @@
         $(function() {
           $('a#test').on('click', function(e) {
             e.preventDefault()
-            $.getJSON('/redirect',
-                function(data) {
-                   // 
-            });
             window.location.replace("/"+e.target['id'])
             return false;
           });

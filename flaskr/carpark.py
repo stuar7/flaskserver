@@ -9,7 +9,7 @@ from flaskr.db import get_db
 bp = Blueprint('carpark', __name__)
 
 # TIME_DIFFERENCE dictates how long the last status update is valid for in seconds.
-TIME_DIFFERENCE = 500
+TIME_DIFFERENCE = 5000
 
 @bp.route('/')
 def index():
@@ -104,12 +104,14 @@ def update_carbay(json):
 
 def update_carbay_status(json):
     try:
+        print(json)
+        print(json['status'])
+        print(json['carpark'])
+        print(json['id'])
         conn = get_db()
         cur = conn.cursor()
-        cur.execute("UPDATE ? status = ?, date = ? WHERE id = ?",
-                    (json["carpark"], json["status"], datetime.now().timestamp(),
-                    json["id"])
-                    )
+        print(f"UPDATE { json['carpark']} SET status = \'{ json['status']}\', date = \'{ int(datetime.now().timestamp()) }\' WHERE id = { json['id']};")
+        cur.execute(f"UPDATE { json['carpark']} SET status = \'{ json['status']}\', date = \'{ int(datetime.now().timestamp()) }\' WHERE id = { json['id']};")
         conn.commit()
     except Exception as inst:
         print(inst)
