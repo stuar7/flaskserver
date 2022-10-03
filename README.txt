@@ -6,5 +6,9 @@ If no database is present:
     Run: flask --app flaskr init-db
 A carpark table will need to be manually created.
 
+
+Mqtt service
+
+
 Flask server copied from:
 https://flask.palletsprojects.com/en/2.2.x/tutorial/database/
