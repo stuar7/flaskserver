@@ -1,9 +1,10 @@
 import os
-
-from flask import Flask, request, jsonify #added to top of file
-from flask_cors import CORS #added to top of file
-
-import sqlite3
+from socket import socket
+from flask import Flask, request, jsonify
+from flask_cors import CORS 
+from flask_socketio import SocketIO, send
+from flask_mqtt import Mqtt
+import json
 
 def create_app(test_config=None):
     # create and configure the app
@@ -26,25 +27,60 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # a simple page that says hello
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
-
     from . import db
-    db.init_app(app)
+    db.init_app(app)    
 
-    from . import auth
-    app.register_blueprint(auth.bp)
+    from . import homepage
+    app.register_blueprint(homepage.bp)
+    app.add_url_rule('/', endpoint='index')
 
     from . import carpark
     app.register_blueprint(carpark.bp)
-    app.add_url_rule('/', endpoint='index')
 
-    @app.route('/api/carbay/update',  methods = ['PUT'])
-    def api_update_carbay():
+    # API Route that updates all elements of a carbay entry
+    @app.route('/api/update_entry',  methods = ['PUT'])
+    def api_update_carbay_entry():
         carbay = request.get_json()
         print(carbay)
         return jsonify(carpark.update_carbay(carbay))
+    
+    # API Route that updates only the status of a carbay entry
+    @app.route('/api/update_status',  methods = ['PUT'])
+    def api_update_carbay_status():
+        json = request.get_json()
+        print(json)
+        return jsonify(carpark.update_carbay_status(json))
+
+
+    # MQTT Settings
+    app.config['SECRET_KEY'] = 'mysecret'
+    app.config['MQTT_BROKER_URL'] = '127.0.0.1'
+    app.config['MQTT_BROKER_PORT'] = 1883
+
+    # MQTT Initialize
+    mqtt = Mqtt(app)
+    mqtt.subscribe('/carpark')
+    #socketio = SocketIO(app, cors_allowed_origins='*')
+
+    @mqtt.on_connect()
+    def handle_connect(client, userdata, flags, rc):
+        if rc == 0:
+            print('Connected successfully')
+            mqtt.subscribe('/carpark') # subscribe topic
+        else:
+            print('Bad connection. Code:', rc)
+            
+    @mqtt.on_message()
+    def handle_mqtt_message(client, userdata, message):
+        print(message.payload.decode())
+        msg = message.payload.decode().replace("'", '"')
+        try:
+            msg = json.loads(msg)
+            print(json.loads(msg))
+            if(message.topic == '/carpark'):
+                with app.app_context():
+                    return jsonify(carpark.update_carbay_status(msg))
+        except:
+            return
 
     return app

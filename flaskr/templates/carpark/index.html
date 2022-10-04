@@ -2,19 +2,44 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Carpark{% endblock %}</h1>
-  {% if g.user %}
-    <a class="action" href="{{ url_for('carpark.create') }}">New</a>
-  {% endif %}
+<h1>{% block title %}{{ description }}{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
+<script type=text/javascript>
+  $(function() {
+    $( "#content" ).load( "ajax/test.html #new_content" );
+    $('a#test').on('click', function(e) {
+      e.preventDefault()
+      let test = await $.getJSON('/redirect',
+          function(data) {
+             return data
+      });
+      console.log(test)
+      http.onreadystatechange = function () {
+        if (http.readyState === 4 && http.status === 200) {
+            document.getElementById("json_field").innerHTML = http.responseText;
+        }
+      };
+      return false;
+    });
+  });
+</script>
 <div class="img-overlay-wrap">
-  <img src="../../static/images/test.png">
-  <svg viewBox="0 0 800 800">
-  {% for bays in carbays %}
-    <rect x="{{ bays['pos1'] }}" y="{{ bays['pos2'] }}" width="{{ bays['width'] }}" height="{{ bays['height'] }}" style="fill:{{ bays['colour'] }}" />
-  {% endfor %}
-  </svg>
+  <img src="../../static/images/carpark/{{ carparkimage }}">
+  <div id="svg_content">
+    {% include "carpark/svg_content.html" %}
+  </div>
+<script>
+  $(function refresh() {
+    const svg_content_url = {{ url_for("carpark.svg_content")|tojson }}
+    const svg_content_div = getElementById("svg_content")
+    fetch(svg_content)
+        .then(response => response.text)
+        .then(text => svg_content_div.innerHtml = text)
+    console.log("hello")
+    setTimeout(refresh(), 1000);
+  }
+</script>
 </div>
 {% endblock %}

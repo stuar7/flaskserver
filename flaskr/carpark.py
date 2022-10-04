@@ -1,75 +1,61 @@
-import sqlite3
+from datetime import datetime
+from PIL import Image
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
-from werkzeug.exceptions import abort
-
-from flaskr.auth import login_required
 from flaskr.db import get_db
+import flaskr.api as fetch
 
 bp = Blueprint('carpark', __name__)
 
-@bp.route('/')
-def index():
+# TIME_DIFFERENCE dictates how long the last status update is valid for in seconds.
+# 600 = 10 minutes
+TIME_DIFFERENCE = 600
+
+@bp.route('/<string:carparkname>/')
+@bp.route('/<string:carparkname>')
+def carpark(carparkname="carpark"):
     db = get_db()
-    # posts = db.execute(
-    #     'SELECT p.id, title, body, created, author_id, username'
-    #     ' FROM post p JOIN user u ON p.author_id = u.id'
-    #     ' ORDER BY created DESC'
-    # ).fetchall()
-    # print(posts)
     carbays = db.execute(
-        'SELECT c.id, pos1, pos2, width, height, colour'
-        ' FROM carpark c'
-        ' ORDER BY c.id'
+        f'SELECT id, p1, p2, p3, p4, status, date FROM {carparkname} ORDER BY id'
     ).fetchall()
-   # db.row_factory = sqlite3.Row
-   # row = carbays.fetchone()
 
-   # print(row)
-   # for x in row:
-   #     print(x) 
-    return render_template('carpark/index.html', carbays=carbays)
+    # For loop below determines which colour to mark the carbay as
+    colour = []
+    for x in carbays:
+        time_difference = int(datetime.now().timestamp()) - int(x['date'])
+        if(time_difference > TIME_DIFFERENCE):
+            colour.append("gray")
+        elif(time_difference < TIME_DIFFERENCE):
+            if(x['status'] == "full"):
+                colour.append("red")
+            elif(x['status'] == "empty"):
+                colour.append("green")
+            elif([x['status'] == "gray"]):
+                colour.append("gray")
+    carbays = [dict(i) for i in carbays]
+    for count, currlist in enumerate(carbays):
+        currlist['colour'] = colour[count]
+        # Find the center of the 4 point polygon to position the text displaying parking bay id
+        currlist['centerx'] = (int(currlist['p1'].split(',')[0]) + int(currlist['p2'].split(',')[0]) + int(currlist['p3'].split(',')[0]) +int(currlist['p4'].split(',')[0]))/4 + (-5 if (currlist['id'] < 10) else -8)
+        currlist['centery'] = (int(currlist['p1'].split(',')[1]) + int(currlist['p2'].split(',')[1]) + int(currlist['p3'].split(',')[1]) +int(currlist['p4'].split(',')[1]))/4 + 5
 
-def update_carbay(bay):
-    updated_carbay = {}
-    try:
-        conn = get_db()
-        cur = conn.cursor()
-        cur.execute("UPDATE carpark SET pos1 = ?, pos2 = ?, height = ?, width = ?, colour = ? WHERE id = ?",  
-                     (bay["pos1"], bay["pos2"], bay["height"], 
-                     bay["width"], bay["colour"], 
-                     bay["id"],))
-        conn.commit()
-        #return the user
-        updated_carbay = get_carbay_by_id(bay["id"])
-        print("carbay" + str(updated_carbay))
-    except Exception as inst:
-        print(inst)
-        conn.rollback()
-    finally:
-        conn.close()
-    return updated_carbay
+    # A seperate table, s_carpark, holds unique information regarding the carpark (name, image used)
+    carparktable = db.execute(
+        'SELECT carparkname, imageurl, description'
+        ' FROM s_carpark c'
+        f' WHERE carparkname="{carparkname}"'
+    ).fetchall()
+    imageurl = carparktable[0][1]
+    description = carparktable[0][2]
+    # Dimensions for the background image for the SVG elements to map on to
+    dimensions = [0,0]
+    im = Image.open(f'./flaskr/static/images/carpark/{imageurl}')
+    dimensions[0], dimensions[1] = im.size
 
+    return render_template('carpark/index.html', carbays=carbays, carparkimage=imageurl, carparkname=carparkname, description=description, dimensions=dimensions)
 
-def get_carbay_by_id(bay_id):
-    carbay = {}
-    try:
-        conn = get_db()
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM carpark WHERE id = ?", 
-                       (bay_id,))
-        row = cur.fetchone()
-
-        # convert row object to dictionary
-        carbay["id"] = row["id"]
-        carbay["pos1"] = row["pos1"]
-        carbay["pos2"] = row["pos2"]
-        carbay["width"] = row["width"]
-        carbay["height"] = row["height"]
-        carbay["colour"] = row["colour"]
-    except:
-        carbay = {}
-
-    return carbay
+@bp.route('/svg_content')
+def svg_content():
+    return
+        

@@ -6,5 +6,12 @@ If no database is present:
     Run: flask --app flaskr init-db
 A carpark table will need to be manually created.
 
-Flask server copied from:
+
+MQTT - Message Queuing Telemetry Transport:
+Windows: https://delightnet.nl/index.php/mqtt/12-mqtt-broker-installation
+For accessability purposes, this smart-parking demo uses "allow_anonymous true" for mosquitto.conf.
+Linux:
+Mac:
+
+Base Flask and SQLite server:
 https://flask.palletsprojects.com/en/2.2.x/tutorial/database/
