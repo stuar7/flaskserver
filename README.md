@@ -12,6 +12,11 @@
 A table for each carpark will need to be manually created, along with the sensor entries.
 
 # App Layout:
+__init__.py
+homepage.py
+carpark.py
+db.py
+api.py
     
 
 # Components based on:
@@ -19,4 +24,8 @@ A table for each carpark will need to be manually created, along with the sensor
     https://flask.palletsprojects.com/en/2.2.x/tutorial/database/
 
 # Run The Server
+<<<<<<< HEAD:README.txt
 flask --app parkr run --host=0.0.0.0
+=======
+flask --app flaskr run --host=0.0.0.0
+>>>>>>> 3d67df2eb36affa8f8ee9f07fb212322b66fc971:README.md
