@@ -1,5 +1,4 @@
 <link rel= "stylesheet" type= "text/css" href='/static/overlay.css' />
-<meta http-equiv="refresh" content="1" >
 {% extends 'base.html' %}
 
 {% block header %}
@@ -9,6 +8,7 @@
 {% block content %}
 <script type=text/javascript>
   $(function() {
+    $( "#content" ).load( "ajax/test.html #new_content" );
     $('a#test').on('click', function(e) {
       e.preventDefault()
       let test = await $.getJSON('/redirect',
@@ -27,10 +27,19 @@
 </script>
 <div class="img-overlay-wrap">
   <img src="../../static/images/carpark/{{ carparkimage }}">
-  <svg viewBox="0 0 800 800">
-  {% for bays in carbays %}
-    <polygon points="{{ bays['p1'] }} {{ bays['p2'] }} {{ bays['p3'] }} {{ bays['p4'] }}" fill="{{ bays['colour'] }}" fill-opacity="60%"/>
-  {% endfor %}
-  </svg>
+  <div id="svg_content">
+    {% include "carpark/svg_content.html" %}
+  </div>
+<script>
+  $(function refresh() {
+    const svg_content_url = {{ url_for("carpark.svg_content")|tojson }}
+    const svg_content_div = getElementById("svg_content")
+    fetch(svg_content)
+        .then(response => response.text)
+        .then(text => svg_content_div.innerHtml = text)
+    console.log("hello")
+    setTimeout(refresh(), 1000);
+  }
+</script>
 </div>
 {% endblock %}

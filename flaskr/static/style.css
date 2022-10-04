@@ -12,3 +12,6 @@ input.danger { color: #cc2f2e; }
 input[type=submit] { align-self: start; min-width: 10em; }
 .leftpanel {vertical-align: top;}
 .lefttable {border: 1px solid;}
+.small {
+    font: 13px sans-serif;
+  }
