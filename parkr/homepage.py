@@ -2,8 +2,8 @@ from datetime import datetime
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
-from flaskr.db import get_db
-import flaskr.api as fetch
+from parkr.db import get_db
+import parkr.api as fetch
 
 bp = Blueprint('homepage', __name__)
 

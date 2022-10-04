@@ -8,7 +8,7 @@
     Linux:
     Mac:
 4. A database is present, but may be initialized with:
-    flask --app flaskr init-db
+    flask --app parkr init-db
 A table for each carpark will need to be manually created, along with the sensor entries.
 
 # App Layout:
@@ -19,4 +19,4 @@ A table for each carpark will need to be manually created, along with the sensor
     https://flask.palletsprojects.com/en/2.2.x/tutorial/database/
 
 # Run The Server
-flask --app flaskr run --host=0.0.0.0
+flask --app parkr run --host=0.0.0.0
