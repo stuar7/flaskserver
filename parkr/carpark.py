@@ -3,8 +3,8 @@ from PIL import Image
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
-from flaskr.db import get_db
-import flaskr.api as fetch
+from parkr.db import get_db
+import parkr.api as fetch
 
 bp = Blueprint('carpark', __name__)
 
@@ -50,7 +50,7 @@ def carpark(carparkname="carpark"):
     description = carparktable[0][2]
     # Dimensions for the background image for the SVG elements to map on to
     dimensions = [0,0]
-    im = Image.open(f'./flaskr/static/images/carpark/{imageurl}')
+    im = Image.open(f'./parkr/static/images/carpark/{imageurl}')
     dimensions[0], dimensions[1] = im.size
 
     return render_template('carpark/index.html', carbays=carbays, carparkimage=imageurl, carparkname=carparkname, description=description, dimensions=dimensions)
