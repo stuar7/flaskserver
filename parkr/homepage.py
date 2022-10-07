@@ -3,7 +3,7 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
 from parkr.db import get_db
-import parkr.api as fetch
+import parkr.dbfunctions as fetch
 
 bp = Blueprint('homepage', __name__)
 
