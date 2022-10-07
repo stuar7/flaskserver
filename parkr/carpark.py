@@ -4,7 +4,7 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
 from parkr.db import get_db
-import parkr.api as fetch
+import parkr.dbfunctions as fetch
 
 bp = Blueprint('carpark', __name__)
 
@@ -12,8 +12,8 @@ bp = Blueprint('carpark', __name__)
 # 600 = 10 minutes
 TIME_DIFFERENCE = 600
 
-@bp.route('/<string:carparkname>/')
-@bp.route('/<string:carparkname>')
+@bp.route('/c/<string:carparkname>/')
+@bp.route('/c/<string:carparkname>')
 def carpark(carparkname="carpark"):
     db = get_db()
     carbays = db.execute(
@@ -48,12 +48,21 @@ def carpark(carparkname="carpark"):
     ).fetchall()
     imageurl = carparktable[0][1]
     description = carparktable[0][2]
+
     # Dimensions for the background image for the SVG elements to map on to
     dimensions = [0,0]
     im = Image.open(f'./parkr/static/images/carpark/{imageurl}')
     dimensions[0], dimensions[1] = im.size
 
-    return render_template('carpark/index.html', carbays=carbays, carparkimage=imageurl, carparkname=carparkname, description=description, dimensions=dimensions)
+    # Car park statistics
+    empty, full, non_responding = fetch.get_carpark_stats(carparkname)
+
+    return render_template('carpark/index.html', 
+        carbays=carbays, carparkimage=imageurl, 
+        carparkname=carparkname, description=description, 
+        dimensions=dimensions, empty=empty,
+        full=full, non_responding=non_responding
+    )
 
 @bp.route('/svg_content')
 def svg_content():

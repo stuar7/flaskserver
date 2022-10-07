@@ -15,3 +15,13 @@ input[type=submit] { align-self: start; min-width: 10em; }
 .small {
     font: 13px sans-serif;
   }
+svg text {
+  pointer-events: none;
+}
+polygon, rect {
+  stroke: rgb(0, 0, 0);
+  stroke-width: 1px
+}
+.stats {
+  list-style: none;
+}

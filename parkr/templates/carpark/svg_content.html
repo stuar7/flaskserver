@@ -1,6 +1,0 @@
-<svg viewBox="0 0 {{ dimensions[0] }} {{ dimensions[1] }}">
-    {% for bays in carbays %}
-      <polygon points="{{ bays['p1'] }} {{ bays['p2'] }} {{ bays['p3'] }} {{ bays['p4'] }}" fill="{{ bays['colour'] }}" fill-opacity="60%"/>
-      <text x="{{bays['centerx']}}" y="{{bays['centery']}}" class="small">{{bays['id']}}</text>
-    {% endfor %}
-</svg>

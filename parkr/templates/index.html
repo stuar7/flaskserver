@@ -2,12 +2,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 <script type=text/javascript>
         $(function() {
           $('a#test').on('click', function(e) {
             e.preventDefault()
-            window.location.replace("/"+e.target['id'])
+            window.location.replace("/c/"+e.target['id'])
             return false;
           });
         });
@@ -18,21 +18,20 @@
   <span>Car Park List</span>
   <ol>
   {% for carpark in carparks %}
-  <li><a href="/{{carpark['carparkname']}}">{{carpark['description']}}</a>
-  <br><span>Free:{{carpark['empty']}}
+  <li><a href="/c/{{carpark['carparkname']}}">{{carpark['description']}}</a>
+  <br>Free:{{carpark['empty']}}
   <br>Taken:{{carpark['full']}}
-  <br>Unknown:{{carpark['non_responding']}}</span>
+  <br>Unknown:{{carpark['non_responding']}}
   {% endfor %}
   </ol>
 </td>
 <td>
 <div class="img-overlay-wrap">
     <a href=# id=test2><img  id="map" src="../../static/images/cropped.png"></a>
-   <!---<svg>   viewBox="0 0 800 800"> -->
     <svg viewBox="0 0 992 1576">
         {% for carpark in carparks %}
         <a href=# id=test><polygon id="{{carpark['carparkname']}}" points="{{ carpark['points'] }}" fill="lightgreen" fill-opacity="30%"/></a>
-        <rect x="{{carpark['x'] - 4}}" y="{{carpark['y'] - 14}}" width="{{carpark['description'] | length * 9}}" height="18" fill="lightgray" />
+        <rect x="{{carpark['x'] - 7}}" y="{{carpark['y'] - 14}}" width="{{carpark['description'] | length * 8}}" height="18" fill="lightgray" />
         <text x="{{carpark['x']}}" y="{{carpark['y']}}" class="small">{{carpark['description']}}</text>
         {% endfor %}
     </svg>

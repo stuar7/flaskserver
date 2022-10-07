@@ -6,40 +6,36 @@
 {% endblock %}
 
 {% block content %}
-<script type=text/javascript>
-  $(function() {
-    $( "#content" ).load( "ajax/test.html #new_content" );
-    $('a#test').on('click', function(e) {
-      e.preventDefault()
-      let test = await $.getJSON('/redirect',
-          function(data) {
-             return data
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script> 
+<script type="text/javascript">
+   $("document").ready(function(){
+       $(".bay").on("click", 
+       function(e){
+       console.log(e.target['id'])
+       document.querySelector('#element').innerHTML = "Parking Bay: "+e.target['id']+", Status: "+e.target['status']
       });
-      console.log(test)
-      http.onreadystatechange = function () {
-        if (http.readyState === 4 && http.status === 200) {
-            document.getElementById("json_field").innerHTML = http.responseText;
-        }
-      };
-      return false;
-    });
-  });
+   });
 </script>
+<div>
+  <ol>
+    <li>Free:{{ empty }}</li>
+    <li>Taken:{{ full }}</li>
+    <li>Unknown:{{ non_responding }}</li>
+  </ol>
+</div>
 <div class="img-overlay-wrap">
   <img src="../../static/images/carpark/{{ carparkimage }}">
   <div id="svg_content">
-    {% include "carpark/svg_content.html" %}
+    <svg viewBox="0 0 {{ dimensions[0] }} {{ dimensions[1] }}">
+      {% for bays in carbays %}
+        <polygon id={{ bays['id'] }} class="bay" points="{{ bays['p1'] }} {{ bays['p2'] }} {{ bays['p3'] }} {{ bays['p4'] }}" fill="{{ bays['colour'] }}" fill-opacity="60%" status="{{ bays['status'] }}"/>
+        <text x="{{bays['centerx']}}" y="{{bays['centery']}}" class="small">{{bays['id']}}</text>
+      {% endfor %}
+  </svg>
   </div>
-<script>
-  $(function refresh() {
-    const svg_content_url = {{ url_for("carpark.svg_content")|tojson }}
-    const svg_content_div = getElementById("svg_content")
-    fetch(svg_content)
-        .then(response => response.text)
-        .then(text => svg_content_div.innerHtml = text)
-    console.log("hello")
-    setTimeout(refresh(), 1000);
-  }
-</script>
+  <div>
+    <br>
+    <span id="element"></span>
+  </div>
 </div>
 {% endblock %}
