@@ -37,7 +37,7 @@ def carpark(carparkname="carpark"):
     for count, currlist in enumerate(carbays):
         currlist['colour'] = colour[count]
         # Find the center of the 4 point polygon to position the text displaying parking bay id
-        currlist['centerx'] = (int(currlist['p1'].split(',')[0]) + int(currlist['p2'].split(',')[0]) + int(currlist['p3'].split(',')[0]) +int(currlist['p4'].split(',')[0]))/4 + (-5 if (currlist['id'] < 10) else -8)
+        currlist['centerx'] = (int(currlist['p1'].split(',')[0]) + int(currlist['p2'].split(',')[0]) + int(currlist['p3'].split(',')[0]) +int(currlist['p4'].split(',')[0]))/4 + (-5 if currlist['id'] < 10 else -8 if currlist['id'] < 100 else -11)
         currlist['centery'] = (int(currlist['p1'].split(',')[1]) + int(currlist['p2'].split(',')[1]) + int(currlist['p3'].split(',')[1]) +int(currlist['p4'].split(',')[1]))/4 + 5
 
     # A seperate table, s_carpark, holds unique information regarding the carpark (name, image used)
