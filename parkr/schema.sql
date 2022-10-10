@@ -18,10 +18,10 @@ CREATE TABLE carbays (
       REFERENCES carpark (carparkname)
 );
 
-CREATE TABLE log (
-  logid INTEGER PRIMARY KEY,
-  id INTEGER,
-  carparkname TEXT,
-  status TEXT NOT NULL,
-  date TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE sensorlog (
+	logid	INTEGER,
+	carparkname	TEXT NOT NULL,
+	status	TEXT NOT NULL,
+	date	TEXT NOT NULL,
+	PRIMARY KEY(logid AUTOINCREMENT)
 );
