@@ -23,7 +23,7 @@ def carpark(carparkname="carpark"):
     # For loop below determines which colour to mark the carbay as
     colour = []
     for x in carbays:
-        time_difference = int(datetime.now().timestamp()) - int(x['date'])
+        time_difference = float(datetime.now().timestamp()) - int(float(x['date']))
         if(time_difference > TIME_DIFFERENCE):
             colour.append("gray")
         elif(time_difference < TIME_DIFFERENCE):
