@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS 
 from flask_socketio import SocketIO, send
 from flask_mqtt import Mqtt
-from parkr.dbfunctions import update_carbay, update_carbay_status
+from parkr.dbfunctions import log_carpark_and_display, update_carbay, update_carbay_status
 import json
 
 def create_app(test_config=None):
@@ -73,13 +73,16 @@ def create_app(test_config=None):
     # MQTT Message Listener
     @mqtt.on_message()
     def handle_mqtt_message(client, userdata, message):
-        msg = message.payload.decode().replace("'", '"')
         try:
-            msg = json.loads(msg)
-            #print(json.loads(msg))
+            print(message.payload.decode())
+            msg = json.loads(message.payload.decode())
             if(message.topic == '/carpark'):
-                with app.app_context():
-                    return jsonify(update_carbay_status(msg))
+                if "logging" in msg and msg['logging'] == True:
+                    with app.app_context():
+                        return jsonify(log_carpark_and_display(msg))
+                else:
+                    with app.app_context():
+                        return jsonify(update_carbay_status(msg))
         except Exception as inst:
             print(inst)
             return

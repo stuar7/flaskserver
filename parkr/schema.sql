@@ -1,9 +1,11 @@
-DROP TABLE IF EXISTS carpark;
-DROP TABLE IF EXISTS s_carpark;
+CREATE TABLE s_carpark (
+  carparkname TEXT PRIMARY KEY,
+  imageurl TEXT NOT NULL,
+);
 
 CREATE TABLE carbays (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  carparkname TEXT FOREIGN KEY NOT NULL,
+  carparkname TEXT NOT NULL,
   p1 TEXT NOT NULL,
   p2 TEXT NOT NULL,
   p3 TEXT NOT NULL,
@@ -12,11 +14,14 @@ CREATE TABLE carbays (
   date TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   CONSTRAINT fk_carpark
-      FOREIGN KEY (carparkid)
-      REFERENCES carpark (carparkid)
+      FOREIGN KEY (carparkname)
+      REFERENCES carpark (carparkname)
 );
 
-CREATE TABLE s_carpark (
-  carparkname TEXT PRIMARY KEY,
-  imageurl TEXT NOT NULL,
+CREATE TABLE log (
+  logid INTEGER PRIMARY KEY,
+  id INTEGER,
+  carparkname TEXT,
+  status TEXT NOT NULL,
+  date TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 );
