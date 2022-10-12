@@ -16,7 +16,7 @@ A table for each carpark will need to be manually created, along with the sensor
 ## App Layout:
 | File/Directory  | Description |
 | ------------- | ------------- |
-| \__init__.py  | The main Flask application file. Each module is initialized here. |
+| \_\_init\_\_.py  | The main Flask application file. Each module is initialized here. |
 | homepage.py  | Contains code relating to the index page |
 | carpark.py  | Contains code relating to the car park pages. Each car park is dynamically created. |
 | db.py  | Contains code relating to SQLite database initialization and loading |
@@ -28,4 +28,4 @@ Base Flask and SQLite server:
 https://flask.palletsprojects.com/en/2.2.x/tutorial/database/
 
 # Run The Server
-flask --app parkr run --host=0.0.0.0
+flask --app parkr run --host=<hostname> --no-reload

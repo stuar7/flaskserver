@@ -10,7 +10,7 @@ bp = Blueprint('carpark', __name__)
 
 # TIME_DIFFERENCE dictates how long the last status update is valid for in seconds.
 # 600 = 10 minutes
-TIME_DIFFERENCE = 600
+TIME_DIFFERENCE = 600000000
 
 @bp.route('/c/<string:carparkname>/')
 @bp.route('/c/<string:carparkname>')
