@@ -2,7 +2,7 @@ from datetime import datetime
 from parkr.db import get_db
 
 # TIME_DIFFERENCE dictates how long the last status update is valid for in seconds.
-TIME_DIFFERENCE = 60000
+TIME_DIFFERENCE = 6000000
 
 def create_carbay(json):
     try:
