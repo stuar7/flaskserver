@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 import time
 import os
 import threading
-from tracemalloc import start
 from flask import Flask, current_app, request, jsonify
 from flask_mqtt import Mqtt
 from parkr.dbfunctions import log_carpark_and_display, update_carbay, update_carbay_status, get_carpark_stats
@@ -30,27 +29,13 @@ def create_app(test_config=None):
 
     from . import homepage
     app.register_blueprint(homepage.bp)
-    app.add_url_rule('/', endpoint='index') #???
+    #app.add_url_rule('/', endpoint='index') #???
 
     from . import carpark
     app.register_blueprint(carpark.bp)
 
     from . import analysis
     app.register_blueprint(analysis.bp)
-
-    # API Route that updates all elements of a carbay entry
-    @app.route('/api/update_entry',  methods = ['PUT'])
-    def api_update_carbay_entry():
-        carbay = request.get_json()
-        print(carbay)
-        return jsonify(update_carbay(carbay))
-    
-    # API Route that updates only the status of a carbay entry
-    @app.route('/api/update_status',  methods = ['PUT'])
-    def api_update_carbay_status():
-        json = request.get_json()
-        print(json)
-        return jsonify(update_carbay_status(json))
 
     # MQTT Settings
     app.config['SECRET_KEY'] = 'mysecret' #unused

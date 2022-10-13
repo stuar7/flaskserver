@@ -11,22 +11,6 @@
     <input type="date" name="end-date" value="{{endDate}}">
     <input type="time" name="start-time" min="00:00" max="24:00" value="{{startTime}}">
     <input type="time" name="end-time" min="00:00" max="24:00" value="{{endTime}}">
-    <label for="bay-status">Bay Status:</label>
-    
-    {% if baystatus == 0 %}
-        {% set zero = 'selected'%}
-    {% endif %}
-    {% if baystatus == 1 %}
-        {% set one = 'selected'%}
-    {% endif %}
-    {% if baystatus == 2 %}
-        {% set two = 'selected'%}
-    {% endif %}
-    <select id="bay-status" name="bay-status">
-        <option value=0 {{zero}}>Empty</option>
-        <option value=1 {{one}}>Full</option>
-        <option value=2 {{two}}>Unknown</option>
-      </select>
     <button type="submit" value="submit">Submit</button>
 </form>
 Entries calculated: {{valuesCalculated}}
