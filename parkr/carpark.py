@@ -57,11 +57,14 @@ def carpark(carparkname="carpark"):
     # Car park statistics
     empty, full, non_responding = fetch.get_carpark_stats(carparkname)
 
+    # Current Time
+    currentTime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+
     return render_template('carpark/index.html', 
         carbays=carbays, carparkimage=imageurl, 
         carparkname=carparkname, description=description, 
         dimensions=dimensions, empty=empty,
-        full=full, non_responding=non_responding
+        full=full, non_responding=non_responding, currentTime=currentTime
     )
 
 @bp.route('/svg_content')

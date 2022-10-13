@@ -2,7 +2,7 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h1>{% block title %}{{ description }}{% endblock %}</h1>
+<h1>{% block title %}{{ description }}<br><a href={{ url_for('analysis.analysis', carparkname=carparkname) }}>Analysis</a>{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
@@ -34,6 +34,7 @@
   </svg>
   </div>
   <div>
+    Last retrieved at: {{ currentTime }}
     <br>
     <span id="element"></span>
   </div>

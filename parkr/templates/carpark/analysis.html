@@ -1,0 +1,70 @@
+<link rel= "stylesheet" type= "text/css" href='/static/overlay.css' />
+
+{% extends 'base.html' %}
+
+{% block header %}
+<h1><a href={{ url_for('carpark.carpark', carparkname=carparkname) }}>{% block title %}{{ description }}</a>{% endblock %}</h1>
+{% endblock %}
+{% block content %}
+<form action="{{ url_for('analysis.analysis', carparkname=carparkname) }}" method="GET">
+    <input type="date" name="start-date" value="{{startDate}}">
+    <input type="date" name="end-date" value="{{endDate}}">
+    <input type="time" name="start-time" min="00:00" max="24:00" value="{{startTime}}">
+    <input type="time" name="end-time" min="00:00" max="24:00" value="{{endTime}}">
+    <button type="submit" value="submit">Submit</button>
+</form>
+Entries calculated: {{valuesCalculated}}
+<br>
+{% if startDate is defined %}
+From {{startDate}} to {{endDate}}
+{% endif %}
+<br>
+{% if startTime is defined %}
+{% if endTime is defined %}
+Time of Day:{{startTime}} to {{endTime}}
+{% endif %}
+{% endif %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div>
+    <canvas id='myChart'></canvas>
+</div>  
+<script type="text/javascript">
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{dayBinLabels | tojson | safe}},
+            datasets: [{
+                label: 'Parking Bays Empty',
+                data: {{dayBinEmpty}},
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+ 
+{% endblock %}
