@@ -71,7 +71,14 @@ def analysis(carparkname="carpark"):
         description = thiscarpark['description']
     
         snapshot = [dict(i) for i in snapshot]
-        print(len(snapshot))
+        if(len(snapshot) == 0):
+            return render_template('carpark/analysis.html',carparkname=carparkname, 
+        dayBinEmpty=None, dayBinLabels=None,
+        startDate=startDate, endDate=endDate, description=description,
+        valuesCalculated=None, 
+        startTime=datetime.strptime(f'{startTime.hour}:{startTime.minute}:00', '%H:%M:%S').strftime("%H:%M:%S"),
+        endTime=datetime.strptime(f'{endTime.hour}:{endTime.minute}:00', '%H:%M:%S').strftime("%H:%M:%S"))
+        
         
     except sqlite3.OperationalError as inst:
         print(inst)
