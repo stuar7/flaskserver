@@ -39,6 +39,12 @@ def analysis(carparkname="carpark"):
     except:
         datemax = None
 
+    baystatus = 0
+    try:
+        baystatus = int(request.args.get('bay-status'))
+    except:
+        pass
+
 
     startTime = datetime.strptime("8:30", '%H:%M')
     endTime = datetime.strptime("17:30", '%H:%M')
@@ -75,7 +81,8 @@ def analysis(carparkname="carpark"):
             return render_template('carpark/analysis.html',carparkname=carparkname, 
         dayBinEmpty=None, dayBinLabels=None,
         startDate=startDate, endDate=endDate, description=description,
-        valuesCalculated=None, 
+        valuesCalculated=None,
+        baystatus=baystatus, 
         startTime=datetime.strptime(f'{startTime.hour}:{startTime.minute}:00', '%H:%M:%S').strftime("%H:%M:%S"),
         endTime=datetime.strptime(f'{endTime.hour}:{endTime.minute}:00', '%H:%M:%S').strftime("%H:%M:%S"))
         
@@ -84,26 +91,53 @@ def analysis(carparkname="carpark"):
         print(inst)
         return Markup(f"<html><body><p>SQL Server Error!<br> {inst} </p></body></html>")
     
+    numberOfBays = snapshot[0]['BAYS_EMPTY'] + snapshot[0]['BAYS_FULL'] +snapshot[0]['BAYS_UNKNOWN']
+    print(numberOfBays)
     # Per Day
     currentDay = datetime.fromtimestamp(snapshot[0]['date']).day
     dayBinLabels = []
     dayBinEmpty = []
+    # Full
+    dayBinFull = 0
+   
+    # Unknown
+    dayBinUnknown = 0
+    # Empty
+    dayBinEmpty = []
+    statusBins = {'BAYS_EMPTY': [], 'BAYS_FULL': [], 'BAYS_UNKNOWN': []}
+
     dayBinIndex = 0
-    currentDivisor = 0
+    currentDivisor = 1
     dayBinEmpty.append(snapshot[0]['BAYS_EMPTY'])
     dayBinLabels.append(f"{datetime.fromtimestamp(snapshot[0]['date']).strftime('%d%b')}")
     previousEntryDate = snapshot[0]['date']
+    previousEntry = snapshot[0]
+    print(statusBins)
+    statusBins['BAYS_EMPTY'].append(previousEntry['BAYS_EMPTY'])
+    statusBins['BAYS_FULL'].append(previousEntry['BAYS_FULL'])
+    statusBins['BAYS_UNKNOWN'].append(previousEntry['BAYS_UNKNOWN'])
+    print(statusBins)
+
+
     valuesCalculated = 0
+    metric = ['BAYS_EMPTY', 'BAYS_FULL', 'BAYS_UNKNOWN']
     for index, entry in enumerate(snapshot):
-        currentDivisor += 1
         # Current Entry Time
         cET = datetime.fromtimestamp(entry['date'])
         # If the current info does not equal the current day.
         if(cET.day != currentDay):
             dayBinEmpty[dayBinIndex] /= currentDivisor
+            statusBins['BAYS_EMPTY'][dayBinIndex] /= currentDivisor
+            statusBins['BAYS_FULL'][dayBinIndex] /= currentDivisor
+            statusBins['BAYS_UNKNOWN'][dayBinIndex] /= currentDivisor
+            print(statusBins['BAYS_EMPTY'][dayBinIndex])
+            print(dayBinEmpty[dayBinIndex])
             currentDay = datetime.fromtimestamp(entry['date']).day
-            dayBinEmpty.append(entry['BAYS_EMPTY'])
-            currentDivisor = 1
+            dayBinEmpty.append(entry[metric[baystatus]])
+            statusBins['BAYS_EMPTY'].append(entry['BAYS_EMPTY'])
+            statusBins['BAYS_FULL'].append(entry['BAYS_FULL'])
+            statusBins['BAYS_UNKNOWN'].append(entry['BAYS_UNKNOWN'])
+            currentDivisor = 0
             dayBinIndex +=1
             dayBinLabels.append(f"{cET.strftime('%d%b')}")
             valuesCalculated+=1
@@ -115,7 +149,12 @@ def analysis(carparkname="carpark"):
                     time(endTime.hour, endTime.minute), 
                     time(cET.hour, cET.minute))):
                     # This entry falls inside our allowed time range
-                    dayBinEmpty[dayBinIndex] += entry['BAYS_EMPTY']
+                    dayBinEmpty[dayBinIndex] += entry[metric[baystatus]]
+                    statusBins['BAYS_EMPTY'][dayBinIndex] += entry['BAYS_EMPTY']
+                    statusBins['BAYS_FULL'][dayBinIndex] += entry['BAYS_FULL']
+                    statusBins['BAYS_UNKNOWN'][dayBinIndex] += entry['BAYS_UNKNOWN']
+                    print(statusBins['BAYS_EMPTY'][dayBinIndex])
+                    print(dayBinEmpty[dayBinIndex])
                     valuesCalculated+=1                    
                 else:
                     currentDivisor -= 1
@@ -132,12 +171,24 @@ def analysis(carparkname="carpark"):
                     # This entry was too recent
                     currentDivisor -= 1
                 else:
-                    dayBinEmpty[dayBinIndex] += entry['BAYS_EMPTY']
+                    dayBinEmpty[dayBinIndex] += entry[metric[baystatus]]
+                    statusBins['BAYS_EMPTY'][dayBinIndex] += entry['BAYS_EMPTY']
+                    statusBins['BAYS_FULL'][dayBinIndex] += entry['BAYS_FULL']
+                    statusBins['BAYS_UNKNOWN'][dayBinIndex] += entry['BAYS_UNKNOWN']
                     previousEntryDate = entry['date']
                     valuesCalculated+=1
+        currentDivisor += 1
+    if(currentDivisor > 1):
+        statusBins['BAYS_EMPTY'][dayBinIndex] /= currentDivisor
+        statusBins['BAYS_FULL'][dayBinIndex] /= currentDivisor
+        statusBins['BAYS_UNKNOWN'][dayBinIndex] /= currentDivisor
+    print(statusBins)
+    #https://www.chartjs.org/docs/latest/samples/area/line-stacked.html
     return render_template('carpark/analysis.html',carparkname=carparkname, 
         dayBinEmpty=dayBinEmpty, dayBinLabels=dayBinLabels,
         startDate=startDate, endDate=endDate, description=description,
         valuesCalculated=valuesCalculated, 
+        statusBins=statusBins,
+        baystatus=baystatus, numberOfBays=numberOfBays,
         startTime=datetime.strptime(f'{startTime.hour}:{startTime.minute}:00', '%H:%M:%S').strftime("%H:%M:%S"),
         endTime=datetime.strptime(f'{endTime.hour}:{endTime.minute}:00', '%H:%M:%S').strftime("%H:%M:%S"))

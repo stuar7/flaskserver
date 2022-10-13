@@ -30,9 +30,13 @@ def carpark(carparkname="carpark"):
             if(x['status'] == "full"):
                 colour.append("red")
             elif(x['status'] == "empty"):
-                colour.append("green")
-            elif([x['status'] == "gray"]):
+                colour.append("yellow")
+            elif(x['status'] == "gray"):
                 colour.append("gray")
+            elif(x['status'] == "empty_disabled"):
+                colour.append("lightblue")
+            elif(x['status'] == "empty_staff"):
+                colour.append("orange")
     carbays = [dict(i) for i in carbays]
     for count, currlist in enumerate(carbays):
         currlist['colour'] = colour[count]

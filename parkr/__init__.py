@@ -1,8 +1,6 @@
 from datetime import datetime, timedelta
-import sqlite3
 import time
 import os
-import atexit
 import threading
 from tracemalloc import start
 from flask import Flask, current_app, request, jsonify
