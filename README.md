@@ -27,5 +27,8 @@ A table for each carpark will need to be manually created, along with the sensor
 Base Flask and SQLite server:
 https://flask.palletsprojects.com/en/2.2.x/tutorial/database/
 
+# Compatability Problems
+Requires Python3
+
 # Run The Server
 flask --app parkr run --host=0.0.0.0 --no-reload --with-threads
