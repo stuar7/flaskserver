@@ -79,7 +79,7 @@ def get_carpark_stats(carpark):
         for row in statusinfo:
             if int(datetime.now().timestamp()) - int(float(row[1])) > TIME_DIFFERENCE:
                 non_responding+=1
-            elif row[0] == 'empty':
+            elif row[0][0:5] == 'empty':
                 empty+=1
             elif row[0] == 'full':
                 full+=1

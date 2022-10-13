@@ -27,40 +27,68 @@ Time of Day:{{startTime}} to {{endTime}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div>
     <canvas id='myChart'></canvas>
-</div>  
+</div>
 <script type="text/javascript">
     const ctx = document.getElementById('myChart').getContext('2d');
+    const data = {
+        labels: {{dayBinLabels | tojson | safe}},
+        datasets: [
+          {
+            label: 'Full Parking Bays',
+            data: {{statusBins['BAYS_FULL']}},
+            borderColor: 'rgba(233, 66, 66, 1)',
+            backgroundColor: 'rgba(233, 6, 66, 1)',
+            fill: true,
+            tension: 0.1,
+          },
+          {
+            label: 'Empty Parking Bays',
+            data: {{statusBins['BAYS_EMPTY']}},
+            borderColor: 'rgba(22, 233, 88, 1)',
+            backgroundColor: 'rgba(22, 233, 88, 1)',
+            fill: true,
+            tension: 0.1,
+          },
+          {
+            label: 'Unresponsive Parking Bays',
+            data: {{statusBins['BAYS_UNKNOWN']}},
+            borderColor: 'rgba(66, 66, 66, 1)',
+            backgroundColor: 'rgba(66, 66, 66, 1)',
+            fill: true,
+            tension: 0.1,
+          }
+        ]
+      };
     const myChart = new Chart(ctx, {
         type: 'line',
-        data: {
-            labels: {{dayBinLabels | tojson | safe}},
-            datasets: [{
-                label: 'Parking Bays Empty',
-                data: {{dayBinEmpty}},
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 2
-            }]
-        },
+        data: data,
         options: {
+            plugins: {
+                tooltip: {
+                    mode: 'index'
+                },
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            },
             scales: {
+                x: {
+                    title: {
+                      display: true,
+                      text: 'Day'
+                    },
+                },
                 y: {
+                    stacked: true,
+                    title: {
+                      display: true,
+                      text: 'Number of Bays',
+                    },
+                    max: {{numberOfBays}},
                     beginAtZero: true
-                }
+                },
             }
         }
     });
