@@ -3,25 +3,31 @@ CREATE TABLE s_carpark (
   imageurl TEXT NOT NULL,
 );
 
-CREATE TABLE carbays (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  carparkname TEXT NOT NULL,
-  p1 TEXT NOT NULL,
-  p2 TEXT NOT NULL,
-  p3 TEXT NOT NULL,
-  p4 TEXT NOT NULL,
-  status TEXT NOT NULL,
-  date TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE "carpark" (
+	"id"	NUMERIC,
+	"p1"	TEXT NOT NULL,
+	"p2"	TEXT NOT NULL,
+	"p3"	TEXT NOT NULL,
+	"p4"	TEXT NOT NULL,
+	"status"	TEXT NOT NULL,
+	"date"	TEXT NOT NULL,
+	PRIMARY KEY("id")
+)
 
-  CONSTRAINT fk_carpark
-      FOREIGN KEY (carparkname)
-      REFERENCES carpark (carparkname)
+CREATE TABLE "snapshot" (
+	"carparkname"	TEXT,
+	"BAYS_EMPTY"	INTEGER NOT NULL,
+	"BAYS_FULL"	INTEGER NOT NULL,
+	"BAYS_UNKNOWN"	INTEGER NOT NULL,
+	"date"	INTEGER,
+	PRIMARY KEY("carparkname","date")
 );
 
-CREATE TABLE sensorlog (
-	logid	INTEGER,
-	carparkname	TEXT NOT NULL,
-	status	TEXT NOT NULL,
-	date	TEXT NOT NULL,
-	PRIMARY KEY(logid AUTOINCREMENT)
-);
+CREATE TABLE "sensorlog" (
+	"logid"	INTEGER,
+	"carparkname"	TEXT NOT NULL,
+	"status"	TEXT NOT NULL,
+	"date"	TEXT NOT NULL,
+	"id"	INTEGER NOT NULL,
+	PRIMARY KEY("logid" AUTOINCREMENT)
+)

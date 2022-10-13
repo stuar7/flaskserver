@@ -1,27 +1,26 @@
+from datetime import datetime, timedelta
+import sqlite3
+import time
 import os
-from socket import socket
-from flask import Flask, request, jsonify
-from flask_cors import CORS 
-from flask_socketio import SocketIO, send
+import atexit
+import threading
+from tracemalloc import start
+from flask import Flask, current_app, request, jsonify
 from flask_mqtt import Mqtt
-from parkr.dbfunctions import log_carpark_and_display, update_carbay, update_carbay_status
+from parkr.dbfunctions import log_carpark_and_display, update_carbay, update_carbay_status, get_carpark_stats
 import json
 
 def create_app(test_config=None):
     # Create and configure the app
     app = Flask(__name__, instance_relative_config=True)
+    # DB Directory
+    dbdir = os.path.join(app.instance_path, 'parkr.sqlite')
+    # Flask App Config
     app.config.from_mapping(
         SECRET_KEY='dev', #unused
-        DATABASE=os.path.join(app.instance_path, 'parkr.sqlite'),
+        DATABASE=dbdir,
     )
-
-    if test_config is None:
-        # Load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
-    else:
-        # Load the test config if passed in
-        app.config.from_mapping(test_config)
-
+    app.config.from_mapping(test_config)
     # Ensure the instance folder exists
     try:
         os.makedirs(app.instance_path)
@@ -33,10 +32,13 @@ def create_app(test_config=None):
 
     from . import homepage
     app.register_blueprint(homepage.bp)
-    app.add_url_rule('/', endpoint='index')
+    app.add_url_rule('/', endpoint='index') #???
 
     from . import carpark
     app.register_blueprint(carpark.bp)
+
+    from . import analysis
+    app.register_blueprint(analysis.bp)
 
     # API Route that updates all elements of a carbay entry
     @app.route('/api/update_entry',  methods = ['PUT'])
@@ -86,5 +88,41 @@ def create_app(test_config=None):
         except Exception as inst:
             print(inst)
             return
+
+    # Snapshot function
+    # This takes a snapshot of the current database every 30 minutes for each carpark
+    def snapshot():
+        print(f"Snapshot loaded in thread: {threading.current_thread()}")
+        while True:
+            minute_seconds = datetime.now().minute*60
+            seconds = datetime.now().second
+            time_seconds = minute_seconds + seconds
+            sleeptime = 60*60 - time_seconds if time_seconds > 30*60 else 30*60 - time_seconds
+            print(f"{int(sleeptime/60)}m{int((sleeptime)/60%1*60)}s until next snapshot.")
+            time.sleep(sleeptime)
+            timestamp = datetime.now().timestamp()
+            try:
+                with app.app_context():
+                    conn = db.get_db()
+                    carparks = conn.execute(
+                        'SELECT carparkname FROM s_carpark'
+                    ).fetchall()
+                    for current_carpark in carparks:
+                        e, f, n = get_carpark_stats(current_carpark[0])
+                        conn.execute(f"INSERT INTO snapshot (carparkname, BAYS_EMPTY, BAYS_FULL, BAYS_UNKNOWN, date) VALUES (\'{current_carpark[0]}\',{e}, \'{f}\', \'{n}\', {timestamp});")
+                        print(f"INSERT INTO snapshot (carparkname, BAYS_EMPTY, BAYS_FULL, BAYS_UNKNOWN, date) VALUES (\'{current_carpark[0]}\',{e}, \'{f}\', \'{n}\', {timestamp});")
+                        conn.commit()
+            except Exception as inst:
+                print(f"Error with SQL server: {inst}")
+
+    # Starts a new thread or the snapshot function
+    def startSnapshot():  
+        global snapshotThread
+        snapshotThread = threading.Thread(target=snapshot)
+        snapshotThread.daemon=True
+        snapshotThread.start()
+    startSnapshot()
+
+ 
 
     return app
