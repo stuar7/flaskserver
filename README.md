@@ -13,7 +13,9 @@
 
     Mac: https://formulae.brew.sh/formula/mosquitto
 5. A database is present, but may be initialized with:
+
     flask --app parkr init-db
+    
 A table for each carpark will need to be manually created, along with the sensor entries.
 
 ## App Layout:

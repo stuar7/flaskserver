@@ -15,7 +15,7 @@ def index():
     db = get_db()
     carparks = db.execute(
         'SELECT carparkname, points, description, x, y'
-        ' FROM s_carpark c'
+        ' FROM carparkregistry c'
     ).fetchall()
     carparks = [dict(i) for i in carparks]
     for count, currlist in enumerate(carparks):

@@ -44,10 +44,10 @@ def carpark(carparkname="carpark"):
         currlist['centerx'] = (int(currlist['p1'].split(',')[0]) + int(currlist['p2'].split(',')[0]) + int(currlist['p3'].split(',')[0]) +int(currlist['p4'].split(',')[0]))/4 + (-5 if currlist['id'] < 10 else -8 if currlist['id'] < 100 else -11)
         currlist['centery'] = (int(currlist['p1'].split(',')[1]) + int(currlist['p2'].split(',')[1]) + int(currlist['p3'].split(',')[1]) +int(currlist['p4'].split(',')[1]))/4 + 5
 
-    # A seperate table, s_carpark, holds unique information regarding the carpark (name, image used)
+    # A seperate table, carparkregistry, holds unique information regarding the carpark (name, image used)
     carparktable = db.execute(
         'SELECT carparkname, imageurl, description'
-        ' FROM s_carpark c'
+        ' FROM carparkregistry c'
         f' WHERE carparkname="{carparkname}"'
     ).fetchall()
     imageurl = carparktable[0][1]
