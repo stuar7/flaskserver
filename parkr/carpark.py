@@ -64,14 +64,10 @@ def carpark(carparkname="carpark"):
     # Current Time
     currentTime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
-    return render_template('carpark/index.html', 
+    return render_template('carpark/carpark.html', 
         carbays=carbays, carparkimage=imageurl, 
         carparkname=carparkname, description=description, 
         dimensions=dimensions, empty=empty,
         full=full, non_responding=non_responding, currentTime=currentTime
     )
-
-@bp.route('/svg_content')
-def svg_content():
-    return
         

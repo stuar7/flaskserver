@@ -2,7 +2,7 @@
 ## Installation
 1. Change directory to the root directory.
 2. (Optional) Create your own virtual environment.
-3. Run: pip install -r requirements.txt
+3. pip install -r requirements.txt
 4. Set up MQTT (Message Queuing Telemetry Transport) service:
 
     Windows: https://delightnet.nl/index.php/mqtt/12-mqtt-broker-installation
@@ -16,7 +16,7 @@
 
     flask --app parkr init-db
     
-A table for each carpark will need to be manually created, along with the sensor entries.
+    A table for each carpark will need to be manually created, along with the SVG coordinates for each parking bay.
 
 ## App Layout:
 | File/Directory  | Description |

@@ -79,7 +79,7 @@ def analysis(carparkname="carpark"):
         snapshot = [dict(i) for i in snapshot]
         # If the SQL fetch did not return anything, return empty page.
         if(len(snapshot) == 0):
-            return render_template('carpark/analysis.html',carparkname=carparkname, 
+            return render_template('carpark/analysis/analysis.html',carparkname=carparkname, 
         dayBinLabels=dayBinLabels,
         startDate=startDate.strftime('%Y-%m-%d'), endDate=endDate.strftime('%Y-%m-%d'), description=description,
         valuesCalculated=None, statusBins=statusBins,
@@ -148,7 +148,7 @@ def analysis(carparkname="carpark"):
         statusBins['BAYS_EMPTY'][dayBinIndex] /= currentDivisor
         statusBins['BAYS_FULL'][dayBinIndex] /= currentDivisor
         statusBins['BAYS_UNKNOWN'][dayBinIndex] /= currentDivisor
-    return render_template('carpark/analysis.html',carparkname=carparkname, 
+    return render_template('carpark/analysis/analysis.html',carparkname=carparkname, 
         dayBinLabels=dayBinLabels,
         startDate=startDate.strftime('%Y-%m-%d'), endDate=endDate.strftime('%Y-%m-%d'), description=description,
         valuesCalculated=valuesCalculated, 
