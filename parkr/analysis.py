@@ -72,14 +72,14 @@ def analysis(carparkname="carpark"):
             f'SELECT * FROM snapshot WHERE carparkname = \"{carparkname}\"{dateComparison};'
         ).fetchall()
         thiscarpark = db.execute(
-            f'SELECT description FROM s_carpark WHERE carparkname = \"{carparkname}\"'
+            f'SELECT description FROM carparkregistry WHERE carparkname = \"{carparkname}\"'
         ).fetchone()
         description = thiscarpark['description']
     
         snapshot = [dict(i) for i in snapshot]
         # If the SQL fetch did not return anything, return empty page.
         if(len(snapshot) == 0):
-            return render_template('carpark/analysis.html',carparkname=carparkname, 
+            return render_template('carpark/analysis/analysis.html',carparkname=carparkname, 
         dayBinLabels=dayBinLabels,
         startDate=startDate.strftime('%Y-%m-%d'), endDate=endDate.strftime('%Y-%m-%d'), description=description,
         valuesCalculated=None, statusBins=statusBins,
@@ -143,15 +143,12 @@ def analysis(carparkname="carpark"):
                     previousEntryDate = entry['date']
                     valuesCalculated += 1
                     currentDivisor += 1
+    # Finds the average bay value for the last index value
     if(currentDivisor > 1):
-        currentDivisor -= 1
         statusBins['BAYS_EMPTY'][dayBinIndex] /= currentDivisor
         statusBins['BAYS_FULL'][dayBinIndex] /= currentDivisor
         statusBins['BAYS_UNKNOWN'][dayBinIndex] /= currentDivisor
-        if(statusBins['BAYS_EMPTY'][dayBinIndex] + statusBins['BAYS_FULL'][dayBinIndex]+statusBins['BAYS_UNKNOWN'][dayBinIndex] < numberOfBays):
-            statusBins['BAYS_UNKNOWN'][dayBinIndex] += numberOfBays - (statusBins['BAYS_EMPTY'][dayBinIndex] + statusBins['BAYS_FULL'][dayBinIndex]+statusBins['BAYS_UNKNOWN'][dayBinIndex])
-
-    return render_template('carpark/analysis.html',carparkname=carparkname, 
+    return render_template('carpark/analysis/analysis.html',carparkname=carparkname, 
         dayBinLabels=dayBinLabels,
         startDate=startDate.strftime('%Y-%m-%d'), endDate=endDate.strftime('%Y-%m-%d'), description=description,
         valuesCalculated=valuesCalculated, 

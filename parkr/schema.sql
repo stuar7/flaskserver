@@ -1,4 +1,4 @@
-CREATE TABLE s_carpark (
+CREATE TABLE carparkregistry (
   carparkname TEXT PRIMARY KEY,
   imageurl TEXT NOT NULL,
 );

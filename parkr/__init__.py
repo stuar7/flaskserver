@@ -88,7 +88,7 @@ def create_app(test_config=None):
                 with app.app_context():
                     conn = db.get_db()
                     carparks = conn.execute(
-                        'SELECT carparkname FROM s_carpark'
+                        'SELECT carparkname FROM carparkregistry'
                     ).fetchall()
                     for current_carpark in carparks:
                         e, f, n = get_carpark_stats(current_carpark[0])
