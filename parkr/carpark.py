@@ -30,7 +30,7 @@ def carpark(carparkname="carpark"):
             if(x['status'] == "full"):
                 colour.append("red")
             elif(x['status'] == "empty"):
-                colour.append("yellow")
+                colour.append("lightgreen")
             elif(x['status'] == "gray"):
                 colour.append("gray")
             elif(x['status'] == "empty_disabled"):

@@ -97,6 +97,7 @@ def create_app(test_config=None):
                         conn.commit()
             except Exception as inst:
                 print(f"Error with SQL server: {inst}")
+            time.sleep(5)
 
     # Starts a new thread or the snapshot function
     def startSnapshot():  
